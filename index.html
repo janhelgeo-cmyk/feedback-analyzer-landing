@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI-drevet Anmeldelsesanalyse for Din Bedrift</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        @import url('https://rsms.me/inter/inter.css');
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+    <div class="container mx-auto px-6 py-12 max-w-4xl">
+        <header class="text-center mb-12">
+            <h1 class="text-4xl md:text-5xl font-bold text-gray-900">Forstå Dine Kunder, Lynraskt.</h1>
+            <p class="mt-4 text-lg text-gray-600">Få en AI-generert analyse av dine Google Maps-anmeldelser og lær nøyaktig hva kundene dine elsker – og hva du kan forbedre.</p>
+        </header>
+
+        <main>
+            <div class="bg-white p-8 rounded-lg shadow-md mb-12">
+                <h2 class="text-2xl font-semibold text-gray-900 mb-4">Hva er problemet?</h2>
+                <p class="text-gray-700">Manuell gjennomgang av kundeanmeldelser er tidkrevende. Det er lett å miste oversikten over viktige trender og gjentakende tilbakemeldinger som kan være avgjørende for din bedrifts vekst.</p>
+            </div>
+
+            <div class="bg-white p-8 rounded-lg shadow-md mb-12">
+                <h2 class="text-2xl font-semibold text-gray-900 mb-4">Vår Løsning: En AI-Rapport</h2>
+                <p class="text-gray-700 mb-4">Vi bruker AI til å analysere dine 50 siste anmeldelser på Google Maps. Resultatet er en oversiktlig rapport som gir deg innsikten du trenger, uten at du må lese en eneste anmeldelse selv.</p>
+                <div class="bg-gray-100 p-4 rounded-md mt-6 border border-gray-200">
+                    <h3 class="font-semibold text-gray-800 mb-2">Du får en rapport med:</h3>
+                    <ul class="list-disc list-inside text-gray-700 space-y-1">
+                        <li>Et kjapt sammendrag av kundesentimentet.</li>
+                        <li>Liste over dine 3-5 største styrker, med sitater.</li>
+                        <li>Liste over 3-5 konkrete forbedringsområder.</li>
+                        <li>Handlingsorienterte forslag du kan implementere umiddelbart.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div id="bestilling" class="bg-white p-8 rounded-lg shadow-md">
+                <h2 class="text-2xl font-semibold text-gray-900 text-center mb-2">Klar til å prøve?</h2>
+                <p class="text-center text-gray-600 mb-6">Lanseringstilbud: Kun 499,- NOK (eks. mva)</p>
+                
+                <form id="contact-form" class="space-y-4">
+                    <div>
+                        <label for="name" class="block text-sm font-medium text-gray-700">Ditt Navn</label>
+                        <input type="text" id="name" name="name" required class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-gray-700">Din E-post</label>
+                        <input type="email" id="email" name="email" required class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+                    <div>
+                        <label for="gmaps_url" class="block text-sm font-medium text-gray-700">Link til din bedrifts Google Maps-side</label>
+                        <input type="url" id="gmaps_url" name="gmaps_url" required placeholder="https://maps.app.goo.gl/..." class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+                    <div>
+                        <button type="submit" id="submit-button" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                            Bestill Analyse
+                        </button>
+                    </div>
+                </form>
+                 <div id="form-feedback" class="mt-4 text-center"></div>
+            </div>
+        </main>
+
+        <footer class="text-center mt-12 text-sm text-gray-500">
+            <p>&copy; 2026 Mind Matter AS. En tjeneste levert av Orion.</p>
+        </footer>
+    </div>
+    <script>
+        const form = document.getElementById('contact-form');
+        const feedbackDiv = document.getElementById('form-feedback');
+        const submitButton = document.getElementById('submit-button');
+
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            submitButton.disabled = true;
+            submitButton.innerText = 'Sender...';
+            feedbackDiv.innerText = '';
+
+            const formData = new FormData(form);
+
+            try {
+                const response = await fetch('/functions/submit', {
+                    method: 'POST',
+                    body: formData,
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    feedbackDiv.innerText = result.message;
+                    feedbackDiv.className = 'mt-4 text-center text-green-700';
+                    form.reset();
+                } else {
+                    feedbackDiv.innerText = result.message || 'En ukjent feil oppstod.';
+                    feedbackDiv.className = 'mt-4 text-center text-red-700';
+                }
+            } catch (error) {
+                feedbackDiv.innerText = 'Nettverksfeil. Prøv igjen senere.';
+                feedbackDiv.className = 'mt-4 text-center text-red-700';
+            } finally {
+                submitButton.disabled = false;
+                submitButton.innerText = 'Bestill Analyse';
+            }
+        });
+    </script>
+</body>
+</html>
